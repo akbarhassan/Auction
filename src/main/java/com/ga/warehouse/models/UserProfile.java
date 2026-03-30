@@ -5,18 +5,22 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "userprofile")
+@Table(name = "user_profile")
 public class UserProfile {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column
     private String fullName;
@@ -45,4 +49,12 @@ public class UserProfile {
     @OneToOne
     @JoinColumn(name = "user_id", unique = true, nullable = false)
     private User user;
+
+    @CreationTimestamp
+    @Column(updatable = false, name = "created_at")
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

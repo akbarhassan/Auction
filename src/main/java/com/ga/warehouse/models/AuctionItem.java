@@ -1,7 +1,7 @@
 package com.ga.warehouse.models;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ga.warehouse.enums.WareHouseItemsCondition;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,29 +12,43 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "auction_items")
+public class AuctionItem {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
     @Column
     private String description;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private Set<User> users = new HashSet<>();
+    @Column
+    private String displayImage;
+
+    @Column
+    private String galleryImage;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private WareHouseItemsCondition status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User createdBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
@@ -43,6 +57,4 @@ public class Role {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-
 }

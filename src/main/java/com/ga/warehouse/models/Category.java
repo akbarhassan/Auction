@@ -1,7 +1,6 @@
 package com.ga.warehouse.models;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,22 +18,25 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "categories")
+public class Category {
+
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column
     private String description;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private Set<User> users = new HashSet<>();
+    @Column
+    private String categoryImage;
+
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<AuctionItem> auctionItems = new HashSet<>();
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
@@ -43,6 +45,4 @@ public class Role {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-
 }
