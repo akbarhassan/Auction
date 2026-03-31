@@ -49,6 +49,10 @@ public class User {
     @JsonIgnore
     private List<BID> bids = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<PasswordHistory> passwordHistories = new ArrayList<>();
+
     @Column(nullable = false)
     private boolean deleted;
 
