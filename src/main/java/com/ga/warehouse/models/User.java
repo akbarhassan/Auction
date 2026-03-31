@@ -8,6 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -39,11 +41,13 @@ public class User {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
-    @JoinColumn(name = "user_profile_id")
     private UserProfile userProfile;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "bidder")
+    @JsonIgnore
+    private List<BID> bids = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean deleted;
