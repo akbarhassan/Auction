@@ -64,4 +64,11 @@ public class User {
         this.userProfile = userProfile;
         if (userProfile != null) userProfile.setUser(this);
     }
+
+    public void removeProfile() {
+        if (this.userProfile != null) {
+            this.userProfile.setUser(null);
+            this.userProfile = null;
+        }
+    }
 }
