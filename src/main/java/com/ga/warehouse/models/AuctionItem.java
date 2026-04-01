@@ -11,8 +11,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
 
 @Setter
 @Getter
@@ -28,6 +26,9 @@ public class AuctionItem {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(unique = true)
+    private String sku;
 
     @Column
     private String description;

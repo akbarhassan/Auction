@@ -22,7 +22,7 @@ public class EmailVerificationToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 100)
     private String token;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -33,7 +33,7 @@ public class EmailVerificationToken {
     private LocalDateTime expiresAt;
 
     @Column(nullable = false)
-    private boolean used;
+    private boolean used = false;
 
     @CreationTimestamp
     @Column(updatable = false)

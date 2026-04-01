@@ -1,7 +1,6 @@
 package com.ga.warehouse.models;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,9 +33,6 @@ public class BID {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_id")
     private Auction auction;
-
-    @Column(nullable = false)
-    private LocalDateTime bidTime;
 
     @CreationTimestamp
     @Column
