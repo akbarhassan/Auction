@@ -10,6 +10,7 @@ import com.ga.warehouse.repositories.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Set;
 
@@ -25,6 +26,11 @@ public class RoleService {
         this.permissionRepository = permissionRepository;
     }
 
+    /**
+     *
+     * @param role
+     * @return
+     */
     public Role createRole(Role role) {
         if (roleRepository.existsByName(role.getName())) {
             throw new ResourceAlreadyExistsException(role.getName());
@@ -32,14 +38,29 @@ public class RoleService {
         return roleRepository.save(role);
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
     }
 
+    /**
+     *
+     * @param roleId
+     * @return
+     */
     public Role findRoleById(Long roleId) {
         return roleRepository.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("No role exists with current id"));
     }
 
+    /**
+     *
+     * @param roleId
+     * @param role
+     * @return
+     */
     public Role updateRole(Long roleId, Role role) {
         Role existingRole = roleRepository.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("No role exists with current id : " + roleId));
         if (role.getName() != null && !role.getName().isBlank()) {
@@ -60,6 +81,12 @@ public class RoleService {
     }
 
 
+    /**
+     *
+     * @param roleId
+     * @param permissionIds
+     * @return
+     */
     @Transactional
     public Role addPermissionsToRole(Long roleId, Set<Long> permissionIds) {
         Role role = roleRepository.findById(roleId)
@@ -73,6 +100,12 @@ public class RoleService {
         return roleRepository.save(role);
     }
 
+    /**
+     *
+     * @param roleId
+     * @param permissionId
+     * @return
+     */
     @Transactional
     public Role removePermissionFromRole(Long roleId, Long permissionId) {
         Role role = roleRepository.findById(roleId)
@@ -85,6 +118,10 @@ public class RoleService {
         return roleRepository.save(role);
     }
 
+    /**
+     *
+     * @param roleId
+     */
     public void deleteRoleById(Long roleId) {
         if (!roleRepository.existsById(roleId)) {
             throw new ResourceNotFoundException("Role with id : " + roleId + " not found");

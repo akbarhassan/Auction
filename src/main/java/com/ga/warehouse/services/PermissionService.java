@@ -20,6 +20,11 @@ public class PermissionService {
         this.permissionRepository = permissionRepository;
     }
 
+    /**
+     *
+     * @param permission
+     * @return
+     */
     @Transactional
     public Permission createPermission(Permission permission) {
         if (permission.getAction() != null && permissionRepository.existsByAction(permission.getAction()))
@@ -28,16 +33,31 @@ public class PermissionService {
     }
 
 
+    /**
+     *
+     * @return
+     */
     public List<Permission> findAllPermissions() {
         return permissionRepository.findAll();
     }
 
+    /**
+     *
+     * @param permissionId
+     * @return
+     */
     public Permission findPermissionById(Long permissionId) {
         return permissionRepository.findById(permissionId).orElseThrow(
                 () -> new ResourceNotFoundException("Permission not found")
         );
     }
 
+    /**
+     *
+     * @param id
+     * @param updates
+     * @return
+     */
     @Transactional
     public Permission updatePermission(Long id, Permission updates) {
         Permission existing = permissionRepository.findById(id)
@@ -54,6 +74,10 @@ public class PermissionService {
         }
     }
 
+    /**
+     *
+     * @param permissionId
+     */
     public void deletePermissionById(Long permissionId) {
         if (!permissionRepository.existsById(permissionId)) {
             throw new ResourceNotFoundException("Permission not found");
