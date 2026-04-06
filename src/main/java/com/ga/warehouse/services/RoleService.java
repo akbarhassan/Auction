@@ -5,10 +5,11 @@ import com.ga.warehouse.exceptions.ResourceAlreadyExistsException;
 import com.ga.warehouse.exceptions.ResourceNotFoundException;
 import com.ga.warehouse.models.Permission;
 import com.ga.warehouse.models.Role;
+import com.ga.warehouse.repositories.PermissionRepository;
 import com.ga.warehouse.repositories.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
@@ -16,10 +17,12 @@ import java.util.Set;
 public class RoleService {
 
     private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
 
     @Autowired
-    public RoleService(RoleRepository roleRepository) {
+    public RoleService(RoleRepository roleRepository, PermissionRepository permissionRepository) {
         this.roleRepository = roleRepository;
+        this.permissionRepository = permissionRepository;
     }
 
     public Role createRole(Role role) {
@@ -34,15 +37,11 @@ public class RoleService {
     }
 
     public Role findRoleById(Long roleId) {
-        return roleRepository.findById(roleId).orElseThrow(
-                () -> new ResourceNotFoundException("No role exists with current id")
-        );
+        return roleRepository.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("No role exists with current id"));
     }
 
     public Role updateRole(Long roleId, Role role) {
-        Role existingRole = roleRepository.findById(roleId).orElseThrow(
-                () -> new ResourceNotFoundException("No role exists with current id : " + roleId)
-        );
+        Role existingRole = roleRepository.findById(roleId).orElseThrow(() -> new ResourceNotFoundException("No role exists with current id : " + roleId));
         if (role.getName() != null && !role.getName().isBlank()) {
             if (!role.getName().equals(existingRole.getName())) {
                 if (roleRepository.existsByName(role.getName())) {
@@ -60,33 +59,31 @@ public class RoleService {
         return roleRepository.save(existingRole);
     }
 
-//    public Role addPermissionsToRole(Long roleId, Set<Long> permissionIds) {
-//        Role role = roleRepository.findById(roleId).orElseThrow(
-//                () -> new ResourceNotFoundException("No role exists with current id : " + roleId)
-//        );
-//
-//        for (Long permId : permissionIds) {
-//            Permission permission = permissionRepository.findById(permId)
-//                    .orElseThrow(() -> new ResourceNotFoundException("Permission", permId));
-//
-//            role.getPermissions().add(permission);
-//        }
-//
-//        return roleRepository.save(role);
-//
-//    }
 
-//    public Role removePermissionFromRole(Long roleId, Long permissionId) {
-//        Role role = roleRepository.findById(roleId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Role with id : " + roleId + " does not exist"));
-//
-//        Permission permission = permissionRepository.findById(permissionId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Permission with id : " + permissionId + " does not exist"));
-//
-//        role.getPermissions().remove(permission);
-//
-//        return roleRepository.save(role);
-//    }
+    @Transactional
+    public Role addPermissionsToRole(Long roleId, Set<Long> permissionIds) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new ResourceNotFoundException("No role exists with id: " + roleId));
+
+        for (Long permId : permissionIds) {
+            Permission permission = permissionRepository.findById(permId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Permission with ID " + permId + " not found"));
+            role.getPermissions().add(permission);
+        }
+        return roleRepository.save(role);
+    }
+
+    @Transactional
+    public Role removePermissionFromRole(Long roleId, Long permissionId) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Role with id: " + roleId + " not found"));
+
+        Permission permission = permissionRepository.findById(permissionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Permission with id: " + permissionId + " not found"));
+
+        role.getPermissions().remove(permission); // now works with @EqualsAndHashCode.Include
+        return roleRepository.save(role);
+    }
 
     public void deleteRoleById(Long roleId) {
         if (!roleRepository.existsById(roleId)) {
