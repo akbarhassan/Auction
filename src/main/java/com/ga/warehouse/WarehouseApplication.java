@@ -6,8 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class WarehouseApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(WarehouseApplication.class, args);
-	}
+    static {
+        io.github.cdimascio.dotenv.Dotenv.configure().load();
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(WarehouseApplication.class, args);
+    }
 
 }

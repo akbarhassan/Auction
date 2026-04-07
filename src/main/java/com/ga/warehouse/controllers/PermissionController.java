@@ -7,6 +7,7 @@ import com.ga.warehouse.services.PermissionService;
 import com.ga.warehouse.utils.ResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
@@ -29,6 +30,7 @@ public class PermissionController {
      * @return
      */
     @PostMapping("/")
+    @PreAuthorize("hasAuthority('permission:create')")
     public ResponseEntity<SuccessResponse> createPermission(@RequestBody Permission permission) {
         Permission createdPermission = permissionService.createPermission(permission);
         return ResponseBuilder.success(HttpStatus.CREATED, "Permission created successfully", createdPermission);
@@ -40,6 +42,7 @@ public class PermissionController {
      * @return
      */
     @GetMapping("/")
+    @PreAuthorize("hasAuthority('permission:view')")
     public ResponseEntity<SuccessResponse> getAllPermissions() {
         List<Permission> allPermissions = permissionService.findAllPermissions();
         return ResponseBuilder.success(HttpStatus.OK, "All Permissions retrieved successfully", allPermissions);
@@ -51,6 +54,7 @@ public class PermissionController {
      * @return
      */
     @GetMapping("/{permissionId}")
+    @PreAuthorize("hasAuthority('permission:view')")
     public ResponseEntity<SuccessResponse> getPermissionById(@PathVariable("permissionId") Long permissionId) {
         Permission permission = permissionService.findPermissionById(permissionId);
         return ResponseBuilder.success(HttpStatus.OK, "Permission retrieved successfully", permission);
@@ -63,6 +67,7 @@ public class PermissionController {
      * @return
      */
     @PutMapping("/{permissionId}")
+    @PreAuthorize("hasAuthority('permission:update')")
     public ResponseEntity<SuccessResponse> updatePermission(@PathVariable("permissionId") Long permissionId, @RequestBody Permission permission) {
         Permission updatedPermission = permissionService.updatePermission(permissionId, permission);
         return ResponseBuilder.success(HttpStatus.OK, "Permission updated successfully", updatedPermission);
@@ -74,6 +79,7 @@ public class PermissionController {
      * @return
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('permission:delete')")
     public ResponseEntity<SuccessResponse> deletePermissionById(@PathVariable Long id) {
         permissionService.deletePermissionById(id);
         return ResponseBuilder.success(HttpStatus.OK, "Role deleted successfully", null);

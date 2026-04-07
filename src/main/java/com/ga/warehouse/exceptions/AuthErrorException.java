@@ -1,4 +1,8 @@
 package com.ga.warehouse.exceptions;
 
-public class AuthErrorException {
+public class AuthErrorException extends RuntimeException {
+    public AuthErrorException(String message) {
+        super(message);
+    }
+
 }

@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class RoleController {
      * @return
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('role:create')")
     public ResponseEntity<SuccessResponse> createRole(@Valid @RequestBody Role role) {
         Role createdRole = roleService.createRole(role);
         return ResponseBuilder.success(HttpStatus.CREATED, "Role created successfully", createdRole);
@@ -41,6 +43,7 @@ public class RoleController {
      * @return
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('role:view')")
     public ResponseEntity<SuccessResponse> getAllRoles() {
         List<Role> allRoles = roleService.getAllRoles();
         return ResponseBuilder.success(HttpStatus.OK, "All roles retrieved successfully", allRoles);
@@ -52,6 +55,7 @@ public class RoleController {
      * @return
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('role:view')")
     public ResponseEntity<SuccessResponse> getRoleById(@PathVariable Long id) {
         Role role = roleService.findRoleById(id);
         return ResponseBuilder.success(HttpStatus.OK, "Role retrieved successfully", role);
@@ -64,6 +68,7 @@ public class RoleController {
      * @return
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('role:update')")
     public ResponseEntity<SuccessResponse> updateRole(@PathVariable Long id, @Valid @RequestBody Role role) {
         Role updatedRole = roleService.updateRole(id, role);
         return ResponseBuilder.success(HttpStatus.OK, "Role updated successfully", updatedRole);
@@ -76,6 +81,7 @@ public class RoleController {
      * @return
      */
     @PostMapping("/{id}/permissions")
+    @PreAuthorize("hasAuthority('role:update')")
     public ResponseEntity<SuccessResponse> addPermission(@PathVariable Long id, @RequestBody
     @NotEmpty(message = "At least one permission ID is required") Set<Long> permissionIds) {
         Role updatedRole = roleService.addPermissionsToRole(id, permissionIds);
@@ -89,6 +95,7 @@ public class RoleController {
      * @return
      */
     @DeleteMapping("/{id}/permissions/{permissionId}")
+    @PreAuthorize("hasAuthority('role:delete')")
     public ResponseEntity<SuccessResponse> removePermission(
             @PathVariable Long id,
             @PathVariable Long permissionId) {
@@ -103,6 +110,7 @@ public class RoleController {
      * @return
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('role:delete')")
     public ResponseEntity<SuccessResponse> deleteRole(@PathVariable Long id) {
         roleService.deleteRoleById(id);
         return ResponseBuilder.success(HttpStatus.OK, "Role deleted successfully", null);
