@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleInformationNotFound(
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(
             ResourceNotFoundException ex
     ) {
         ErrorResponse error = new ErrorResponse(
@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(ResourceAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleInformationExist(
+    public ResponseEntity<ErrorResponse> handleResourceAlreadyExists(
             ResourceAlreadyExistsException ex
     ) {
         ErrorResponse error = new ErrorResponse(
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorResponse> handleInformationExist(
+    public ResponseEntity<ErrorResponse> handleValidationException(
             ValidationException ex
     ) {
         ErrorResponse error = new ErrorResponse(
@@ -58,5 +58,17 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthErrorException.class)
+    public ResponseEntity<ErrorResponse> AuthErrorException(
+            ValidationException ex
+    ) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 }

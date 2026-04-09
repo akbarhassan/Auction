@@ -2,12 +2,16 @@ package com.ga.warehouse.services;
 
 
 import com.ga.warehouse.enums.UserStatus;
+import com.ga.warehouse.exceptions.AuthErrorException;
 import com.ga.warehouse.exceptions.ResourceAlreadyExistsException;
 import com.ga.warehouse.exceptions.ResourceNotFoundException;
 import com.ga.warehouse.models.Role;
 import com.ga.warehouse.models.User;
 import com.ga.warehouse.repositories.RoleRepository;
 import com.ga.warehouse.repositories.UserRepository;
+import com.ga.warehouse.security.JwtUtils;
+import com.ga.warehouse.security.MyUserDetails;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
@@ -50,9 +55,7 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        Role role = roleRepository.findById(user.getRole().getId()).orElseThrow(
-                () -> new ResourceNotFoundException("Role with id " + user.getRole().getId() + " not found")
-        );
+        Role role = roleRepository.findById(user.getRole().getId()).orElseThrow(() -> new ResourceNotFoundException("Role with id " + user.getRole().getId() + " not found"));
         user.setRole(role);
 
         User newUser = userRepository.save(user);
@@ -67,15 +70,11 @@ public class UserService {
 
 
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("User with id : " + id + " not found")
-        );
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id : " + id + " not found"));
     }
 
     public User updateUser(Long userId, User user) {
-        User currentUser = userRepository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User with id : " + userId + " not found")
-        );
+        User currentUser = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with id : " + userId + " not found"));
 
         if (!currentUser.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(user.getEmail())) {
@@ -86,9 +85,7 @@ public class UserService {
 
         if (user.getRole() != null && user.getRole().getId() != null) {
             if (!currentUser.getRole().getId().equals(user.getRole().getId())) {
-                currentUser.setRole(roleRepository.findById(user.getRole().getId()).orElseThrow(
-                        () -> new ResourceNotFoundException("Role with id : " + user.getRole().getId() + " not found")
-                ));
+                currentUser.setRole(roleRepository.findById(user.getRole().getId()).orElseThrow(() -> new ResourceNotFoundException("Role with id : " + user.getRole().getId() + " not found")));
             }
         }
 
@@ -100,9 +97,12 @@ public class UserService {
 
     }
 
+    public User findUserByEmailAddress(String email) {
+        return userRepository.findUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User with email : " + email + " not found"));
+    }
+
     public User deleteUserById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id: " + id + " not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id: " + id + " not found"));
 
         if (user.isDeleted()) {
             return user;

@@ -1,0 +1,1 @@
+### Here is where the email templates reside and the pdf templates
