@@ -44,14 +44,12 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/users/login",
-                                "/auth/users/register",
-                                "/api/auth/verify",
-                                "/auth/roles",
-                                "/auth/permissions",
-                                "/auth/users/password/reset",
-                                "/auth/users/password/reset/page",
-                                "/auth/users/password/reset/submit",
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/register",
+                                "/api/v1/auth/verify",
+                                "/api/v1/auth/password/reset",
+                                "/api/v1/auth/password/reset/page",
+                                "/api/v1/auth/password/reset/submit",
                                 "/upload"
                         ).permitAll()
                         .anyRequest().authenticated()
