@@ -113,45 +113,4 @@ public class UserService {
         user.setDeleted(true);
         return userRepository.save(user);
     }
-
-    public User registerUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new ResourceAlreadyExistsException("User with email : " + user.getEmail() + "already exists");
-        }
-
-        user.setDeleted(false);
-        user.setEmailVerified(true);
-        if (user.getStatus() == null) user.setStatus(UserStatus.PENDING);
-
-        if (user.getRole() == null || user.getRole().getId() == null) {
-            throw new ResourceNotFoundException("Role is required");
-        }
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        Role role = roleRepository.findById(user.getRole().getId()).orElseThrow(() -> new ResourceNotFoundException("Role with id " + user.getRole().getId() + " not found"));
-
-        user.setRole(role);
-
-        User newUser = userRepository.save(user);
-
-        // Handle mail service here
-        return newUser;
-    }
-
-    public String loginUser(User user) {
-        User currentUser = userRepository.findUserByEmail(user.getEmail()).orElseThrow(() -> new ResourceNotFoundException("User with email : " + user.getEmail() + " not found"));
-
-        if (!passwordEncoder.matches(user.getPassword(), currentUser.getPassword())) {
-            throw new AuthErrorException("Wrong password");
-        }
-
-        if (!user.getStatus().equals(UserStatus.ACTIVE)) {
-            throw new AuthErrorException("Wrong status");
-        }
-
-        MyUserDetails userDetails = new MyUserDetails(currentUser);
-
-        return jwtUtils.generateJwtToken(userDetails);
-    }
 }
