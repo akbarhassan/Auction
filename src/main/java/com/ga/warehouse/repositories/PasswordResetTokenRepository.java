@@ -20,6 +20,8 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
 
     List<PasswordResetToken> findByExpiresAtBefore(LocalDateTime now);
 
-    @Query("SELECT t FROM EmailVerificationToken t WHERE t.token = :token AND t.expiresAt > :now AND t.used = false")
+    @Query("SELECT t FROM PasswordResetToken t WHERE t.token = :token AND t.expiresAt > :now AND t.used = false")
     Optional<PasswordResetToken> findValidToken(@Param("token") String token, @Param("now") LocalDateTime now);
+
+    void deleteByUserId(Long userId);
 }

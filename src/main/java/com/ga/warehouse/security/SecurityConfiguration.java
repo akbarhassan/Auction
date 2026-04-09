@@ -48,9 +48,8 @@ public class SecurityConfiguration {
                                 "/api/v1/auth/register",
                                 "/api/v1/auth/verify-email",
                                 "/api/v1/auth/resend-verification",
-                                "/api/v1/auth/password/reset",
-                                "/api/v1/auth/password/reset/page",
-                                "/api/v1/auth/password/reset/submit",
+                                "/api/v1/auth/request-password-reset",
+                                "/api/v1/auth/reset-password",
                                 "/upload"
                         ).permitAll()
                         .anyRequest().authenticated()
