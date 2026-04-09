@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/v1/auth/roles")
+@RequestMapping("/api/v1/roles")
 public class RoleController {
     private final RoleService roleService;
 
