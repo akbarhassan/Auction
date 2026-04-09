@@ -1,10 +1,9 @@
 package com.ga.warehouse.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -15,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "user_profile")
 public class UserProfile {
     @Id
@@ -22,25 +22,26 @@ public class UserProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(length = 100)
     private String fullName;
 
-    @Column
+    @Column(length = 20)
+    @Pattern(regexp = "^\\+?[0-9\\s\\-\\(\\)]+$", message = "Invalid phone number format")
     private String mobileNumber;
 
-    @Column
+    @Column(length = 500)
     private String profilePicture;
 
-    @Column
+    @Column(length = 100)
     private String country;
 
-    @Column
+    @Column(length = 100)
     private String city;
 
-    @Column
+    @Column(length = 255)
     private String street;
 
-    @Column
+    @Column(length = 100)
     private String building;
 
     @Column
@@ -48,13 +49,16 @@ public class UserProfile {
 
     @OneToOne
     @JoinColumn(name = "user_id", unique = true, nullable = false)
+    @JsonIgnore
     private User user;
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
+    @JsonIgnore
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
+    @JsonIgnore
     private LocalDateTime updatedAt;
 }
