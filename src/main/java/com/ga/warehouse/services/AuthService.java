@@ -6,6 +6,7 @@ import com.ga.warehouse.enums.UserStatus;
 import com.ga.warehouse.exceptions.AuthErrorException;
 import com.ga.warehouse.exceptions.ResourceAlreadyExistsException;
 import com.ga.warehouse.exceptions.ResourceNotFoundException;
+import com.ga.warehouse.models.EmailVerificationToken;
 import com.ga.warehouse.models.Role;
 import com.ga.warehouse.models.User;
 import com.ga.warehouse.repositories.RoleRepository;
@@ -95,6 +96,43 @@ public class AuthService {
         MyUserDetails userDetails = new MyUserDetails(user);
 
         return jwtUtils.generateJwtToken(userDetails);
+    }
+
+    /**
+     * Verify email using token
+     */
+    @Transactional
+    public void verifyEmail(String token) {
+        EmailVerificationToken verificationToken = tokenService.validateToken(token).orElseThrow(
+                () -> new AuthErrorException("Invalid or expired verification token. Please register again.")
+        );
+
+        User user = verificationToken.getUser();
+        tokenService.markTokenAsUsed(token);
+
+        user.setEmailVerified(true);
+        user.setStatus(UserStatus.ACTIVE);
+        userRepository.save(user);
+    }
+
+
+    /**
+     * Resend verification email
+     */
+    @Transactional
+    public void resendVerificationEmail(String email) {
+        User user = userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "User with email: " + email + " not found"
+                ));
+
+        if (user.getEmailVerified()) {
+            throw new ResourceAlreadyExistsException(
+                    "Email is already verified. You can log in now."
+            );
+        }
+
+        tokenService.sendVerificationEmail(user);
     }
 
 }
