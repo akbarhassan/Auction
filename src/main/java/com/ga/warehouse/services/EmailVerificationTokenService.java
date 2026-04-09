@@ -82,7 +82,7 @@ public class EmailVerificationTokenService {
         EmailVerificationToken token = createToken(user);
         String verificationLink = baseUrl + "/api/auth/verify-email?token=" + token.getToken();
         Map<String, Object> model = new HashMap<>();
-        model.put("username", user.getEmail());
+        model.put("email", user.getEmail());
         model.put("verificationLink", verificationLink);
         model.put("expiresAt", token.getExpiresAt());
 

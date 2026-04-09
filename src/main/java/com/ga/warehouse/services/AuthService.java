@@ -1,15 +1,17 @@
-package com.ga.warehouse.models;
+package com.ga.warehouse.services;
 
 
+import com.ga.warehouse.dto.RegisterRequest;
 import com.ga.warehouse.enums.UserStatus;
 import com.ga.warehouse.exceptions.AuthErrorException;
 import com.ga.warehouse.exceptions.ResourceAlreadyExistsException;
 import com.ga.warehouse.exceptions.ResourceNotFoundException;
+import com.ga.warehouse.models.Role;
+import com.ga.warehouse.models.User;
 import com.ga.warehouse.repositories.RoleRepository;
 import com.ga.warehouse.repositories.UserRepository;
 import com.ga.warehouse.security.JwtUtils;
 import com.ga.warehouse.security.MyUserDetails;
-import com.ga.warehouse.services.EmailVerificationTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,30 +46,26 @@ public class AuthService {
      * Register a new user (email NOT verified yet)
      */
     @Transactional
-    public User register(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new ResourceAlreadyExistsException("User with email : " + user.getEmail() + "already exists");
+    public User register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ResourceAlreadyExistsException("User with email : " + request.getEmail() + "already exists");
         }
-
-        user.setDeleted(false);
-        user.setEmailVerified(true);
-        if (user.getStatus() == null) user.setStatus(UserStatus.PENDING);
-
-        if (user.getRole() == null || user.getRole().getId() == null) {
-            throw new ResourceNotFoundException("Role is required");
-        }
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         Role role = roleRepository.findById(defaultRoleId).orElseThrow(() -> new ResourceNotFoundException("Default role (ID: " + defaultRoleId + ") not found. Please seed roles first."));
-        user.setRole(role);
 
-        User newUser = userRepository.save(user);
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(role);
+        user.setEmailVerified(false);
+        user.setDeleted(false);
+        user.setStatus(UserStatus.PENDING);
+
 
         // TODO: make this to a queue instead, thread it
-        tokenService.sendVerificationEmail(newUser);
+        tokenService.sendVerificationEmail(user);
 
-        return newUser;
+        return user;
     }
 
 

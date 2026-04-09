@@ -29,7 +29,7 @@ public class PermissionController {
      * @param permission
      * @return
      */
-    @PostMapping("/")
+    @PostMapping
     @PreAuthorize("hasAuthority('permission:create')")
     public ResponseEntity<SuccessResponse> createPermission(@RequestBody Permission permission) {
         Permission createdPermission = permissionService.createPermission(permission);
@@ -41,7 +41,7 @@ public class PermissionController {
      *
      * @return
      */
-    @GetMapping("/")
+    @GetMapping
     @PreAuthorize("hasAuthority('permission:view')")
     public ResponseEntity<SuccessResponse> getAllPermissions() {
         List<Permission> allPermissions = permissionService.findAllPermissions();
