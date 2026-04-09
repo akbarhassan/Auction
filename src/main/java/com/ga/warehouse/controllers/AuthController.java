@@ -2,11 +2,14 @@ package com.ga.warehouse.controllers;
 
 
 import com.ga.warehouse.dto.LoginRequest;
+import com.ga.warehouse.dto.PasswordChangeRequest;
+import com.ga.warehouse.dto.PasswordResetRequest;
 import com.ga.warehouse.dto.RegisterRequest;
 import com.ga.warehouse.services.AuthService;
 import com.ga.warehouse.models.User;
 import com.ga.warehouse.response.SuccessResponse;
 import com.ga.warehouse.utils.ResponseBuilder;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,6 +74,34 @@ public class AuthController {
         return ResponseBuilder.success(
                 HttpStatus.OK,
                 "Verification email resent. Please check your inbox.",
+                null
+        );
+    }
+
+    /**
+     * Request password reset (send email with reset link)
+     * POST /api/v1/auth/request-password-reset
+     */
+    @PostMapping("/request-password-reset")
+    public ResponseEntity<SuccessResponse> requestPasswordReset(@Valid @RequestBody PasswordResetRequest request) {
+        authService.requestPasswordReset(request.email());
+        return ResponseBuilder.success(
+                HttpStatus.OK,
+                "If an account exists with this email, a password reset link has been sent.",
+                null
+        );
+    }
+
+    /**
+     * Reset password using token from email
+     * POST /api/v1/auth/reset-password
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<SuccessResponse> resetPassword(@Valid @RequestBody PasswordChangeRequest request) {
+        authService.resetPassword(request.token(), request.password());
+        return ResponseBuilder.success(
+                HttpStatus.OK,
+                "Password reset successful. You can now log in with your new password.",
                 null
         );
     }
