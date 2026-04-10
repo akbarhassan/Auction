@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,6 +38,15 @@ public class FileStorageService {
 
         } catch (Exception ex) {
             throw new RuntimeException("Failed to upload file: " + ex.getMessage(), ex);
+        }
+    }
+
+    public void deleteFile(String fileName, String subPath) {
+        try {
+            Path filePath = Paths.get(uploadDir, subPath, fileName);
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to delete file: " + fileName, e);
         }
     }
 }
