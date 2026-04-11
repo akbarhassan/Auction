@@ -11,6 +11,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -36,8 +38,10 @@ public class AuctionItem {
     @Column
     private String displayImage;
 
-    @Column
-    private String galleryImage;
+    @ElementCollection
+    @CollectionTable(name = "auction_item_gallery", joinColumns = @JoinColumn(name = "auction_item_id"))
+    @Column(name = "image_url")
+    private List<String> galleryImages = new ArrayList<>();
 
     @Column
     @Enumerated(EnumType.STRING)
