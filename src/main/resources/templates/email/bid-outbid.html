@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+
+<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #007bff;">
+    <h2 style="color: #007bff; margin-top: 0;">🔔 You've Been Outbid!</h2>
+
+    <p>Hello <strong th:text="${bidderName}">Bidder</strong>,</p>
+
+    <p>Your bid on <strong th:text="${itemName}">Item Name</strong> has been surpassed.</p>
+
+    <div style="background: white; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #ddd;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Item:</td>
+                <td style="padding: 8px 0;" th:text="${itemName}">Item Name</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Your Bid:</td>
+                <td style="padding: 8px 0; color: #666;" th:text="${'€' + previousBid}">€100</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; font-weight: bold;">New Highest Bid:</td>
+                <td style="padding: 8px 0; color: #28a745; font-weight: bold;" th:text="${'€' + newBid}">€150</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px 0; font-weight: bold;">Minimum to Lead:</td>
+                <td style="padding: 8px 0; color: #007bff; font-weight: bold;" th:text="${'€' + minNextBid}">€155</td>
+            </tr>
+        </table>
+    </div>
+
+    <p style="text-align: center; margin: 25px 0;">
+        <a th:href="${auctionLink}"
+           style="display: inline-block; padding: 12px 30px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Place a New Bid
+        </a>
+    </p>
+
+    <p style="font-size: 14px; color: #666;">
+        <strong>Auction ends:</strong>
+        <span th:text="${#temporals.format(auctionEndsAt, 'dd MMM yyyy, HH:mm')}">End Date</span>
+    </p>
+
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 25px 0;">
+
+    <p style="font-size: 12px; color: #999; text-align: center;">
+        This is an automated notification from Auction House.<br>
+        If you no longer wish to receive bid updates,
+        <a th:href="${unsubscribeLink}" style="color: #007bff;">unsubscribe here</a>.
+    </p>
+</div>
+
+</body>
+</html>

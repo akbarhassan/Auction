@@ -4,11 +4,14 @@ package com.ga.warehouse.controllers;
 import com.ga.warehouse.models.Auction;
 import com.ga.warehouse.response.SuccessResponse;
 import com.ga.warehouse.services.AuctionService;
+import com.ga.warehouse.services.UserService;
 import com.ga.warehouse.utils.ResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +22,7 @@ import java.util.List;
 public class AuctionController {
 
     private final AuctionService auctionService;
-
+    private final UserService userService;
 
     /**
      *
@@ -28,8 +31,11 @@ public class AuctionController {
      */
     @PostMapping
     @PreAuthorize("hasAuthority('auction:create')")
-    public ResponseEntity<SuccessResponse> createAuction(@RequestBody Auction auction) {
-        Auction createdAuction = auctionService.createAuction(auction);
+
+    public ResponseEntity<SuccessResponse> createAuction(@RequestBody Auction auction, @AuthenticationPrincipal UserDetails userDetails) {
+        Long creatorId = userService.findUserByEmailAddress(userDetails.getUsername()).getId();
+
+        Auction createdAuction = auctionService.createAuction(auction, creatorId);
         return ResponseBuilder.success(HttpStatus.CREATED, "Auction created successfully", createdAuction);
     }
 

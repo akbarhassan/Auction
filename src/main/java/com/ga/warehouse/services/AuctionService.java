@@ -34,7 +34,7 @@ public class AuctionService {
      * @return
      */
     @Transactional
-    public Auction createAuction(Auction auction) {
+    public Auction createAuction(Auction auction, Long authenticatedUserId) {
         if (auction.getStartPrice() == null || auction.getStartPrice() <= 0) {
             throw new ValidationException("Start price must be greater than 0");
         }
@@ -64,7 +64,8 @@ public class AuctionService {
             throw new ValidationException("Auction creator user is required");
         }
 
-        User creator = userRepository.findById(auction.getAuctionedBy().getId()).orElseThrow(() -> new ResourceNotFoundException("Auction creator not found"));
+        User creator = userRepository.findById(authenticatedUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
         auction.setAuctionedBy(creator);
 
         AuctionItem item = auctionItemRepository.findById(auction.getAuctionItem().getId()).orElseThrow(() -> new ResourceNotFoundException("Auction item not found"));

@@ -15,6 +15,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -34,9 +35,8 @@ public class EmailService {
      * @param model
      */
     @Async
-    public void sendEmail(String to, String subject, String templateName, Object model) {
+    public void sendEmail(String to, String subject, String templateName, Map<String, Object> model) {
         try {
-
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
             helper.setTo(to);
@@ -44,18 +44,19 @@ public class EmailService {
             helper.setFrom(fromAddress);
 
             Context context = new Context();
-            context.setVariable("model", model);
+            if (model != null) {
+                context.setVariables(model);
+            }
 
-            String htmlContent = templateEngine.process(templateName, context);
+            String htmlContent = templateEngine.process("email/" + templateName, context);
             helper.setText(htmlContent, true);
 
             mailSender.send(mimeMessage);
-
-            log.info("Email sent successfully ", to);
+            log.info("✅ Email sent successfully to {}", to);
 
         } catch (MessagingException ex) {
-            log.error(ex.getMessage(), ex);
-            throw new RuntimeException("email sending failed", ex);
+            log.error("❌ Failed to send email to {}: {}", to, ex.getMessage(), ex);
+            throw new RuntimeException("Email sending failed", ex);
         }
     }
 }
