@@ -43,7 +43,7 @@ public class RoleController {
      * @return
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('role:view')")
+    @PreAuthorize("hasAuthority('role:read')")
     public ResponseEntity<SuccessResponse> getAllRoles() {
         List<Role> allRoles = roleService.getAllRoles();
         return ResponseBuilder.success(HttpStatus.OK, "All roles retrieved successfully", allRoles);
@@ -55,7 +55,7 @@ public class RoleController {
      * @return
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('role:view')")
+    @PreAuthorize("hasAuthority('role:read')")
     public ResponseEntity<SuccessResponse> getRoleById(@PathVariable Long id) {
         Role role = roleService.findRoleById(id);
         return ResponseBuilder.success(HttpStatus.OK, "Role retrieved successfully", role);

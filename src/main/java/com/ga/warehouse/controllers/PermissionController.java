@@ -42,7 +42,7 @@ public class PermissionController {
      * @return
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('permission:view')")
+    @PreAuthorize("hasAuthority('permission:read')")
     public ResponseEntity<SuccessResponse> getAllPermissions() {
         List<Permission> allPermissions = permissionService.findAllPermissions();
         return ResponseBuilder.success(HttpStatus.OK, "All Permissions retrieved successfully", allPermissions);
@@ -54,7 +54,7 @@ public class PermissionController {
      * @return
      */
     @GetMapping("/{permissionId}")
-    @PreAuthorize("hasAuthority('permission:view')")
+    @PreAuthorize("hasAuthority('permission:read')")
     public ResponseEntity<SuccessResponse> getPermissionById(@PathVariable("permissionId") Long permissionId) {
         Permission permission = permissionService.findPermissionById(permissionId);
         return ResponseBuilder.success(HttpStatus.OK, "Permission retrieved successfully", permission);
