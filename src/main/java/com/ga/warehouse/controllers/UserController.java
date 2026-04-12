@@ -39,7 +39,7 @@ public class UserController {
      * @return
      */
     @GetMapping
-    @PreAuthorize("hasAuthority('user:view')")
+    @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<SuccessResponse> getUsers() {
         return ResponseBuilder.success(HttpStatus.OK, "Users", userService.getAllUsers());
     }
@@ -51,7 +51,7 @@ public class UserController {
      * @return
      */
     @GetMapping("{id}")
-    @PreAuthorize("hasAuthority('user:view')")
+    @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<SuccessResponse> getUser(@PathVariable long id) {
         User user = userService.getUserById(id);
         return ResponseBuilder.success(HttpStatus.OK, "User", user);
