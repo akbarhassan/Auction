@@ -24,7 +24,7 @@ public class Auction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private Float startPrice;
 
     @Column(nullable = false)
@@ -43,7 +43,7 @@ public class Auction {
     @Column
     private Float currentHighestBid;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_item_id", nullable = false)
     private AuctionItem auctionItem;
 
