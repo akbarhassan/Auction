@@ -60,10 +60,6 @@ public class AuctionService {
             throw new ResourceAlreadyExistsException("Auction already exists for this item");
         }
 
-        if (auction.getAuctionedBy() == null || auction.getAuctionedBy().getId() == null) {
-            throw new ValidationException("Auction creator user is required");
-        }
-
         User creator = userRepository.findById(authenticatedUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
         auction.setAuctionedBy(creator);
