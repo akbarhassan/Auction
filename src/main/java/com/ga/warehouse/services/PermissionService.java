@@ -4,6 +4,7 @@ import com.ga.warehouse.exceptions.ResourceAlreadyExistsException;
 import com.ga.warehouse.exceptions.ResourceNotFoundException;
 import com.ga.warehouse.models.Permission;
 import com.ga.warehouse.repositories.PermissionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,13 +13,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PermissionService {
     private final PermissionRepository permissionRepository;
-
-    @Autowired
-    public PermissionService(PermissionRepository permissionRepository) {
-        this.permissionRepository = permissionRepository;
-    }
 
     /**
      *

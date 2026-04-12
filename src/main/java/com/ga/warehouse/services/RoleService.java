@@ -7,6 +7,7 @@ import com.ga.warehouse.models.Permission;
 import com.ga.warehouse.models.Role;
 import com.ga.warehouse.repositories.PermissionRepository;
 import com.ga.warehouse.repositories.RoleRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,16 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class RoleService {
 
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
-
-    @Autowired
-    public RoleService(RoleRepository roleRepository, PermissionRepository permissionRepository) {
-        this.roleRepository = roleRepository;
-        this.permissionRepository = permissionRepository;
-    }
 
     /**
      *
