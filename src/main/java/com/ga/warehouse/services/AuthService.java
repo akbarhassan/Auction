@@ -58,13 +58,14 @@ public class AuthService {
         user.setDeleted(false);
         user.setStatus(UserStatus.PENDING);
 
-        savePasswordToHistory(user, encodedPassword);
+        User savedUser = userRepository.save(user);
+        savePasswordToHistory(savedUser, encodedPassword);
 
 
         // TODO: make this to a queue instead, thread it
-        tokenService.sendVerificationEmail(user);
+        tokenService.sendVerificationEmail(savedUser);
 
-        return user;
+        return savedUser;
     }
 
 
