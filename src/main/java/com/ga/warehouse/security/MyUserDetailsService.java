@@ -4,6 +4,7 @@ package com.ga.warehouse.security;
 import com.ga.warehouse.models.User;
 import com.ga.warehouse.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,7 +15,7 @@ public class MyUserDetailsService implements UserDetailsService {
     private UserService userService;
 
     @Autowired
-    public void setUserService(UserService userService) {
+    public void setUserService(@Lazy UserService userService) {
         this.userService = userService;
     }
 
