@@ -26,10 +26,10 @@ public class AuctionItemService {
 
 
     @Transactional
-    public AuctionItem createAuctionItem(AuctionItem auctionItem) {
+    public AuctionItem createAuctionItem(AuctionItem auctionItem, Long authenticatedUserId) {
+        User creator = userRepository.findById(authenticatedUserId).orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
         auctionItem.setSku(SkuGenerator.generate());
-
-        validateAndLinkCreator(auctionItem);
+        auctionItem.setCreatedBy(creator);
 
         if (auctionItem.getCategory() != null && auctionItem.getCategory().getId() != null) {
             Category category = categoryRepository.findById(auctionItem.getCategory().getId())
@@ -130,13 +130,4 @@ public class AuctionItemService {
         throw new ResourceNotFoundException("Image not found in gallery: " + fileName);
     }
 
-
-    private void validateAndLinkCreator(AuctionItem auctionItem) {
-        if (auctionItem.getCreatedBy() == null || auctionItem.getCreatedBy().getId() == null) {
-            throw new IllegalArgumentException("Creator user ID is required");
-        }
-        User creator = userRepository.findById(auctionItem.getCreatedBy().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Creator not found"));
-        auctionItem.setCreatedBy(creator);
-    }
 }

@@ -3,11 +3,14 @@ package com.ga.warehouse.controllers;
 import com.ga.warehouse.models.AuctionItem;
 import com.ga.warehouse.response.SuccessResponse;
 import com.ga.warehouse.services.AuctionItemService;
+import com.ga.warehouse.services.UserService;
 import com.ga.warehouse.utils.ResponseBuilder;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,11 +21,14 @@ import java.util.List;
 @AllArgsConstructor
 public class AuctionItemController {
     private final AuctionItemService auctionItemService;
+    private final UserService userService;
 
     @PostMapping
     @PreAuthorize("hasAuthority('auction-item:create')")
-    public ResponseEntity<SuccessResponse> createAuctionItem(@RequestBody AuctionItem auctionItem) {
-        AuctionItem newItem = auctionItemService.createAuctionItem(auctionItem);
+    public ResponseEntity<SuccessResponse> createAuctionItem(@RequestBody AuctionItem auctionItem, @AuthenticationPrincipal UserDetails userDetails) {
+        Long creatorId = userService.findUserByEmailAddress(userDetails.getUsername()).getId();
+
+        AuctionItem newItem = auctionItemService.createAuctionItem(auctionItem, creatorId);
         return ResponseBuilder.success(HttpStatus.CREATED, "Auction item created successfully", newItem);
     }
 
