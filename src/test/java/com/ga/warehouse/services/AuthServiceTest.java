@@ -106,7 +106,6 @@ public class AuthServiceTest {
             return saved;
         });
         doNothing().when(tokenService).sendVerificationEmail(any(User.class));
-        doNothing().when(passwordHistoryRepository).deleteOldPasswords(anyLong());
 
         User result = authService.register(registerRequest);
 
@@ -347,7 +346,6 @@ public class AuthServiceTest {
         when(passwordEncoder.encode("newpassword123")).thenReturn("new-encoded-password");
         when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
         doNothing().when(resetTokenService).markTokenAsUsed("valid-reset-token");
-        doNothing().when(passwordHistoryRepository).deleteOldPasswords(anyLong());
 
         authService.resetPassword("valid-reset-token", "newpassword123");
 

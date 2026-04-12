@@ -102,26 +102,26 @@ public class PasswordResetTokenServiceTest {
     @Test
     @DisplayName("validateToken: valid unused token → returns token")
     void validateToken_validUnusedToken_returnsToken() {
-        when(tokenRepository.findValidToken("test-reset-token-uuid", now)).thenReturn(Optional.of(token1));
+        when(tokenRepository.findValidToken(eq("test-reset-token-uuid"), any(LocalDateTime.class))).thenReturn(Optional.of(token1));
 
         Optional<PasswordResetToken> result = resetTokenService.validateToken("test-reset-token-uuid");
 
         assertThat(result).isPresent();
         assertThat(result.get().getToken()).isEqualTo("test-reset-token-uuid");
 
-        verify(tokenRepository, times(1)).findValidToken("test-reset-token-uuid", now);
+        verify(tokenRepository, times(1)).findValidToken(eq("test-reset-token-uuid"), any(LocalDateTime.class));
     }
 
     @Test
     @DisplayName("validateToken: invalid token → returns empty")
     void validateToken_invalidToken_returnsEmpty() {
-        when(tokenRepository.findValidToken("invalid-token", now)).thenReturn(Optional.empty());
+        when(tokenRepository.findValidToken(eq("invalid-token"), any(LocalDateTime.class))).thenReturn(Optional.empty());
 
         Optional<PasswordResetToken> result = resetTokenService.validateToken("invalid-token");
 
         assertThat(result).isEmpty();
 
-        verify(tokenRepository, times(1)).findValidToken("invalid-token", now);
+        verify(tokenRepository, times(1)).findValidToken(eq("invalid-token"), any(LocalDateTime.class));
     }
 
     // ============ TEST: markTokenAsUsed ============
