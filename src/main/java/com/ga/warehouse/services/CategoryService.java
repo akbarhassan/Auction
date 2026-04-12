@@ -53,7 +53,7 @@ public class CategoryService {
     @Transactional
     public Category findCategoryById(Long id) {
         return categoryRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("No role exists with current id")
+                () -> new ResourceNotFoundException("No Category exists with current id")
         );
     }
 
