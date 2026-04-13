@@ -495,7 +495,7 @@
             "url": "{{base_url}}/api/v1/auctions",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"startPrice\": 100.0,\n  \"startsAt\": \"2026-12-01T10:00:00\",\n  \"endsAt\": \"2026-12-10T10:00:00\",\n  \"minimumIncrement\": 10.0,\n  \"auctionItem\": {\n    \"id\": 1\n  }\n}"
+              "raw": "{\n  \"startPrice\": 100.0,\n  \"startsAt\": \"2026-04-13T10:00:00\",\n  \"endsAt\": \"2026-04-13T23:00:00\",\n  \"minimumIncrement\": 10.0,\n  \"auctionItem\": {\n    \"id\": 1\n  }\n}"
             }
           }
         },
