@@ -54,18 +54,32 @@ public class AuctionService {
             throw new ValidationException("Auction item is required");
         }
 
-        Optional<Auction> existing = auctionRepository.findByAuctionItemId(auction.getAuctionItem().getId());
+        AuctionItem item = auctionItemRepository.findById(auction.getAuctionItem().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Auction item not found"));
 
+        // Check if item is already sold
+        if (item.getStatus() == com.ga.warehouse.enums.WareHouseItemsCondition.SOLD) {
+            throw new ValidationException("This item has already been sold");
+        }
+
+        // Check if there's an active or pending auction for this item
+        Optional<Auction> existing = auctionRepository.findByAuctionItemId(item.getId());
         if (existing.isPresent()) {
-            throw new ResourceAlreadyExistsException("Auction already exists for this item");
+            AuctionStatus existingStatus = existing.get().getStatus();
+            if (existingStatus == AuctionStatus.ACTIVE || existingStatus == AuctionStatus.PENDING) {
+                throw new ResourceAlreadyExistsException("An active or pending auction already exists for this item");
+            }
+            // CANCELLED or ENDED auctions don't block new auctions (ENDED items should be SOLD already)
         }
 
         User creator = userRepository.findById(authenticatedUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
         auction.setAuctionedBy(creator);
-
-        AuctionItem item = auctionItemRepository.findById(auction.getAuctionItem().getId()).orElseThrow(() -> new ResourceNotFoundException("Auction item not found"));
         auction.setAuctionItem(item);
+
+        // Mark item as being in auction
+        item.setStatus(com.ga.warehouse.enums.WareHouseItemsCondition.AUCTION);
+        auctionItemRepository.save(item);
 
 
         LocalDateTime now = LocalDateTime.now();
@@ -102,6 +116,13 @@ public class AuctionService {
         if (auction.getStatus() != null && auction.getStatus() != existing.getStatus()) {
             if (auction.getStatus() == AuctionStatus.CANCELLED) {
                 existing.setStatus(AuctionStatus.CANCELLED);
+                // Release the item back to ON_HOLD so it can be re-auctioned
+                AuctionItem item = existing.getAuctionItem();
+                if (item != null) {
+                    item.setStatus(com.ga.warehouse.enums.WareHouseItemsCondition.ON_HOLD);
+                    auctionItemRepository.save(item);
+                }
+                return auctionRepository.save(existing);
             } else {
                 throw new IllegalArgumentException("Status can only be changed to CANCELLED manually. ACTIVE/ENDED are system-controlled.");
             }
@@ -200,9 +221,17 @@ public class AuctionService {
         toActivate.forEach(a -> a.setStatus(AuctionStatus.ACTIVE));
         auctionRepository.saveAll(toActivate);
 
-        // ACTIVE → ENDED
+        // ACTIVE → ENDED (and mark item as SOLD)
         List<Auction> toEnd = auctionRepository.findByStatusAndEndsAtBefore(AuctionStatus.ACTIVE, now);
-        toEnd.forEach(a -> a.setStatus(AuctionStatus.ENDED));
+        toEnd.forEach(a -> {
+            a.setStatus(AuctionStatus.ENDED);
+            // Mark the item as SOLD
+            AuctionItem item = a.getAuctionItem();
+            if (item != null) {
+                item.setStatus(com.ga.warehouse.enums.WareHouseItemsCondition.SOLD);
+                auctionItemRepository.save(item);
+            }
+        });
         auctionRepository.saveAll(toEnd);
     }
 }
