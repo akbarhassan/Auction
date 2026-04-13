@@ -85,3 +85,8 @@ A Postman collection is included in the `/postman` folder for testing all API en
 - **Database**: PostgreSQL
 - **Security**: JWT Authentication
 - **Email**: Spring Mail with Thymeleaf templates
+
+## Documentation
+
+- [Database Schema & Relationships](SCHEMA.md)
+- [User Scenarios & Workflows](SCENARIOS.md)
