@@ -105,24 +105,37 @@ public class BIDService {
      * @param previousBidder
      * @param auction
      * @param newBidAmount
+     * @param previousBidAmount
      */
-    private void notifyPreviousBidder(User previousBidder, Auction auction, Float newBidAmount) {
+    private void notifyPreviousBidder(User previousBidder, Auction auction, Float newBidAmount, Float previousBidAmount) {
+        // Extract data BEFORE going async (avoid lazy loading issues)
+        String bidderEmail = previousBidder.getEmail();
+        Long bidderId = previousBidder.getId();
+        String bidderName = getDisplayName(previousBidder);
+        String itemName = auction.getAuctionItem().getName();
+        Long auctionId = auction.getId();
+        Float minIncrement = auction.getMinimumIncrement();
+        Float startPrice = auction.getStartPrice();
+        java.time.LocalDateTime endsAt = auction.getEndsAt();
+
         // Submit to notification thread pool
         CompletableFuture.runAsync(() -> {
             try {
                 log.info("📧 Sending outbid notification in thread: {}",
                         Thread.currentThread().getName());
 
-                sendOutbidNotification(previousBidder, auction, newBidAmount);
+                sendOutbidNotification(bidderEmail, bidderName, itemName, auctionId,
+                        previousBidAmount != null ? previousBidAmount : startPrice,
+                        newBidAmount, minIncrement, endsAt);
 
                 log.info("✅ Outbid notification sent to user {} for auction {}",
-                        previousBidder.getId(), auction.getId());
+                        bidderId, auctionId);
 
             } catch (Exception e) {
                 log.error("❌ Failed to send outbid notification to user {}",
-                        previousBidder.getId(), e);
+                        bidderId, e);
             }
-        }, notificationExecutorService); // 👈 Uses your dedicated notification thread pool
+        }, notificationExecutorService);
     }
 
 
@@ -150,6 +163,7 @@ public class BIDService {
         // 5. Get previous highest bidder (for notification)
         Optional<BID> previousHighestBid = bidRepository.findFirstByAuctionIdOrderByAmountDesc(auctionId);
         User previousBidder = previousHighestBid.map(BID::getBidder).orElse(null);
+        Float previousBidAmount = previousHighestBid.map(BID::getAmount).orElse(null);
 
         BID newBid = new BID();
         newBid.setAmount(bidAmount);
@@ -163,8 +177,8 @@ public class BIDService {
         log.info("✅ Bid placed successfully: {} by user {} on auction {}",
                 bidAmount, bidderId, auctionId);
 
-        if (previousBidder != null) {
-            notifyPreviousBidder(previousBidder, auction, bidAmount);
+        if (previousBidder != null && !previousBidder.getId().equals(bidderId)) {
+            notifyPreviousBidder(previousBidder, auction, bidAmount, previousBidAmount);
         }
 
         return savedBid;
@@ -208,38 +222,33 @@ public class BIDService {
 
     /**
      * Send outbid notification email (called asynchronously)
+     * Uses primitive parameters to avoid lazy loading issues in async context
      */
-    private void sendOutbidNotification(User previousBidder, Auction auction, Float newBidAmount) {
-        String bidderName = getDisplayName(previousBidder);
-
-        Float minNextBid = newBidAmount + auction.getMinimumIncrement();
-        String auctionLink = "http://localhost:8080/auctions/" + auction.getId();
-
-        Float previousBid = previousBidder.getBids().stream()
-                .filter(b -> b.getAuction().getId().equals(auction.getId()))
-                .map(BID::getAmount)
-                .max(Float::compareTo)
-                .orElse(auction.getStartPrice());
+    private void sendOutbidNotification(String bidderEmail, String bidderName, String itemName,
+                                        Long auctionId, Float previousBid, Float newBidAmount,
+                                        Float minIncrement, LocalDateTime endsAt) {
+        Float minNextBid = newBidAmount + minIncrement;
+        String auctionLink = "http://localhost:8080/auctions/" + auctionId;
 
         Map<String, Object> model = Map.of(
                 "bidderName", bidderName,
-                "itemName", auction.getAuctionItem().getName(),
+                "itemName", itemName,
                 "previousBid", previousBid,
                 "newBid", newBidAmount,
                 "minNextBid", minNextBid,
                 "auctionLink", auctionLink,
-                "auctionEndsAt", auction.getEndsAt(),
-                "unsubscribeLink", "http://localhost:8080/unsubscribe?email=" + previousBidder.getEmail()
+                "auctionEndsAt", endsAt,
+                "unsubscribeLink", "http://localhost:8080/unsubscribe?email=" + bidderEmail
         );
 
         emailService.sendEmail(
-                previousBidder.getEmail(),
-                "🔔 You've Been Outbid on " + auction.getAuctionItem().getName(),
+                bidderEmail,
+                "🔔 You've Been Outbid on " + itemName,
                 "email/bid-outbid",
                 model
         );
 
-        log.info("📧 Outbid notification sent to {}", previousBidder.getEmail());
+        log.info("📧 Outbid notification sent to {}", bidderEmail);
     }
 
 
