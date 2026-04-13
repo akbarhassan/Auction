@@ -41,11 +41,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        if (path.startsWith("/auth/users/password/reset") ||
-                path.startsWith("/auth/users/register") ||
-                path.startsWith("/auth/users/login") ||
-                path.startsWith("/auth/users/password/reset/page") ||
-                path.startsWith("/api/auth/verify")) {
+        if (path.startsWith("/api/v1/auth/")) {
             filterChain.doFilter(request, response);
             return;
         }
