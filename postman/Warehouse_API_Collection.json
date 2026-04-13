@@ -16,7 +16,7 @@
             "url": "{{base_url}}/api/v1/auth/register",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123\"}"
             }
           }
         },
@@ -28,7 +28,7 @@
             "url": "{{base_url}}/api/v1/auth/login",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"Password123\"}"
             }
           }
         },
@@ -47,7 +47,7 @@
             "url": "{{base_url}}/api/v1/auth/resend-verification",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\"\n}"
+              "raw": "{\n  \"email\": \"user@example.com\"}"
             }
           }
         },
@@ -59,7 +59,7 @@
             "url": "{{base_url}}/api/v1/auth/request-password-reset",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\"\n}"
+              "raw": "{\n  \"email\": \"user@example.com\"}"
             }
           }
         },
@@ -68,10 +68,10 @@
           "request": {
             "method": "POST",
             "header": [{"key": "Content-Type", "value": "application/json"}],
-            "url": "{{base_url}}/api/v1/auth/reset-password?token={{reset_token}}",
+            "url": "{{base_url}}/api/v1/auth/reset-password",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"newPassword\": \"newpassword123\"\n}"
+              "raw": "{\n  \"token\": \"{{reset_token}}\",\n  \"password\": \"NewPassword123\"}"
             }
           }
         }
@@ -231,7 +231,7 @@
             "url": "{{base_url}}/api/v1/roles/{{role_id}}/permissions",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"permissionIds\": [1, 2, 3]\n}"
+              "raw": "[1, 2, 3]"
             }
           }
         },
@@ -431,7 +431,7 @@
           "request": {
             "method": "POST",
             "header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
-            "url": "{{base_url}}/api/v1/auction-items/{{item_id}}/gallery",
+            "url": "{{base_url}}/api/v1/auction-items/{{item_id}}/gallery-images",
             "body": {
               "mode": "formdata",
               "formdata": [
