@@ -4,7 +4,6 @@ package com.ga.warehouse.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ga.warehouse.enums.WareHouseItemsCondition;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,10 +16,10 @@ import java.util.List;
 
 @Setter
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "auction_items")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AuctionItem {
     @Id
     @Column
