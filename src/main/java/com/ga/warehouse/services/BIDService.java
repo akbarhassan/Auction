@@ -244,7 +244,7 @@ public class BIDService {
         emailService.sendEmail(
                 bidderEmail,
                 "🔔 You've Been Outbid on " + itemName,
-                "email/bid-outbid",
+                "bid-outbid",
                 model
         );
 
