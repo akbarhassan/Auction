@@ -69,7 +69,12 @@ public class AuctionService {
             if (existingStatus == AuctionStatus.ACTIVE || existingStatus == AuctionStatus.PENDING) {
                 throw new ResourceAlreadyExistsException("An active or pending auction already exists for this item");
             }
-            // CANCELLED or ENDED auctions don't block new auctions (ENDED items should be SOLD already)
+            // Delete CANCELLED auctions to allow re-auctioning (unique constraint on auction_item_id)
+            if (existingStatus == AuctionStatus.CANCELLED) {
+                auctionRepository.delete(existing.get());
+                auctionRepository.flush();
+            }
+            // ENDED auctions mean the item is SOLD, which is already checked above
         }
 
         User creator = userRepository.findById(authenticatedUserId)
