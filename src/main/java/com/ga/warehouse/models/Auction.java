@@ -1,6 +1,7 @@
 package com.ga.warehouse.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ga.warehouse.enums.AuctionStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -45,11 +46,13 @@ public class Auction {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_item_id", nullable = false)
+    @JsonIgnoreProperties({"createdBy", "category"})
     private AuctionItem auctionItem;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"role", "passwordHistories", "bids", "userProfile"})
     private User auctionedBy;
 
     @CreationTimestamp

@@ -1,6 +1,7 @@
 package com.ga.warehouse.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,10 +29,12 @@ public class BID {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"role", "passwordHistories", "bids", "userProfile"})
     private User bidder;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "auction_id")
+    @JsonIgnoreProperties({"auctionItem", "auctionedBy"})
     private Auction auction;
 
     @CreationTimestamp
