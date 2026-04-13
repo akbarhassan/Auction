@@ -41,13 +41,17 @@ public class DatabaseSeeder implements CommandLineRunner {
     private void seedPermissions() {
         log.info("Seeding permissions...");
 
-        // Check if permissions already exist
-        if (permissionRepository.count() > 0) {
-            log.info("Permissions already exist. Skipping permission seeding.");
-            return;
+        try {
+            // Check if permissions already exist
+            if (permissionRepository.count() > 0) {
+                log.info("Permissions already exist. Skipping permission seeding.");
+                return;
+            }
+        } catch (Exception e) {
+            log.info("Permissions table doesn't exist yet, proceeding with seeding...");
         }
 
-        String[] models = {"Auction", "AuctionItem", "Permission", "Role", "User", "Category", "UserProfile", "BID"};
+        String[] models = {"auction", "auctionitem", "permission", "role", "user", "category", "userprofile", "bid"};
 
         String[] actions = {"create", "update", "delete", "read"};
 
@@ -55,7 +59,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
         for (String model : models) {
             for (String action : actions) {
-                Permission permission = Permission.builder().action(model.toLowerCase() + ":" + action).build();
+                Permission permission = Permission.builder().action(model + ":" + action).build();
                 permissions.add(permission);
             }
         }
@@ -67,9 +71,13 @@ public class DatabaseSeeder implements CommandLineRunner {
     private void seedRoles() {
         log.info("Seeding roles...");
 
-        if (roleRepository.count() > 0) {
-            log.info("Roles already exist. Skipping role seeding.");
-            return;
+        try {
+            if (roleRepository.count() > 0) {
+                log.info("Roles already exist. Skipping role seeding.");
+                return;
+            }
+        } catch (Exception e) {
+            log.info("Roles table doesn't exist yet, proceeding with seeding...");
         }
 
         // Get all permissions
@@ -95,13 +103,15 @@ public class DatabaseSeeder implements CommandLineRunner {
         Set<Permission> customerPermissions = new HashSet<>();
 
         // Customer permissions
-        addPermissionsForModel(customerPermissions, permissionMap, "UserProfile", Arrays.asList("create", "update", "read"));
-        addPermissionsForModel(customerPermissions, permissionMap, "BID", Arrays.asList("create", "read"));
-        addPermissionsForModel(customerPermissions, permissionMap, "Auction", List.of("read"));
-        addPermissionsForModel(customerPermissions, permissionMap, "AuctionItem", List.of("read"));
-        addPermissionsForModel(customerPermissions, permissionMap, "Category", List.of("read"));
+        addPermissionsForModel(customerPermissions, permissionMap, "userprofile", Arrays.asList("create", "update", "read"));
+        addPermissionsForModel(customerPermissions, permissionMap, "bid", Arrays.asList("create", "read"));
+        addPermissionsForModel(customerPermissions, permissionMap, "auction", List.of("read"));
+        addPermissionsForModel(customerPermissions, permissionMap, "auctionitem", List.of("read"));
+        addPermissionsForModel(customerPermissions, permissionMap, "category", List.of("read"));
 
+        customerRole.setPermissions(customerPermissions);
         roleRepository.save(customerRole);
+        log.info("Created CUSTOMER role with {} permissions", customerPermissions.size());
     }
 
 

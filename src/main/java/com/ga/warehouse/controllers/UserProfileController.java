@@ -14,28 +14,28 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/users/{userId}/profile")
+@RequestMapping("/api/v1/users/{userId}/profile")
 @RequiredArgsConstructor
 public class UserProfileController {
 
     private final UserProfileService profileService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('userProfile:read')")
+    @PreAuthorize("hasAuthority('userprofile:read')")
     public ResponseEntity<SuccessResponse> getProfile(@PathVariable Long userId) {
         UserProfile profile = profileService.getProfileByUserId(userId);
         return ResponseBuilder.success(HttpStatus.OK, "Profile retrieved successfully", profile);
     }
 
     @PutMapping
-    @PreAuthorize("hasAuthority('userProfile:update')")
+    @PreAuthorize("hasAuthority('userprofile:update')")
     public ResponseEntity<SuccessResponse> updateProfile(@PathVariable Long userId, @RequestBody UserProfile profileData) {
         UserProfile updatedProfile = profileService.saveOrUpdate(userId, profileData);
         return ResponseBuilder.success(HttpStatus.OK, "Profile updated successfully", updatedProfile);
     }
 
     @PostMapping("/picture")
-    @PreAuthorize("hasAuthority('userProfile:update')")
+    @PreAuthorize("hasAuthority('userprofile:update')")
     public ResponseEntity<SuccessResponse> uploadPicture(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
         UserProfile updatedProfile = profileService.uploadProfilePicture(userId, file);
         return ResponseBuilder.success(HttpStatus.OK, "Profile picture uploaded successfully", updatedProfile);

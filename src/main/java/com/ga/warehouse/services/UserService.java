@@ -93,6 +93,10 @@ public class UserService {
         return userRepository.findUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User with email : " + email + " not found"));
     }
 
+    public User findUserForAuthentication(String email) {
+        return userRepository.findUserByEmailWithPermissions(email).orElseThrow(() -> new ResourceNotFoundException("User with email : " + email + " not found"));
+    }
+
     public User deleteUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User with id: " + id + " not found"));
 
