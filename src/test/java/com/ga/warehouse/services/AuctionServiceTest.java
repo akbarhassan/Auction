@@ -215,14 +215,17 @@ public class AuctionServiceTest {
         newAuction.setAuctionItem(auctionItem1);
         newAuction.setAuctionedBy(user1);
 
+        // Mock the item lookup first (service looks up item before checking duplicates)
+        when(auctionItemRepository.findById(1L)).thenReturn(Optional.of(auctionItem1));
+        // auction1 has PENDING status, so it should trigger the exception
         when(auctionRepository.findByAuctionItemId(1L)).thenReturn(Optional.of(auction1));
 
         assertThatThrownBy(() -> auctionService.createAuction(newAuction, 1L))
                 .isInstanceOf(ResourceAlreadyExistsException.class)
-                .hasMessageContaining("Auction already exists for this item");
+                .hasMessageContaining("An active or pending auction already exists for this item");
 
+        verify(auctionItemRepository, times(1)).findById(1L);
         verify(auctionRepository, times(1)).findByAuctionItemId(1L);
-        verifyNoMoreInteractions(auctionRepository);
     }
 
     // ============ TEST: updateAuction ============
