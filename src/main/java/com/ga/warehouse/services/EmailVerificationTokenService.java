@@ -80,7 +80,7 @@ public class EmailVerificationTokenService {
     @Transactional
     public void sendVerificationEmail(User user) {
         EmailVerificationToken token = createToken(user);
-        String verificationLink = baseUrl + "/api/auth/verify-email?token=" + token.getToken();
+        String verificationLink = baseUrl + "/api/v1/auth/verify-email?token=" + token.getToken();
         Map<String, Object> model = new HashMap<>();
         model.put("email", user.getEmail());
         model.put("verificationLink", verificationLink);
