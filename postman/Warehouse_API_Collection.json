@@ -360,6 +360,20 @@
             "header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
             "url": "{{base_url}}/api/v1/categories/{{category_id}}"
           }
+        },
+        {
+          "name": "Upload Category Image",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{jwt_token}}"}],
+            "url": "{{base_url}}/api/v1/categories/{{category_id}}/image",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "file", "type": "file", "src": "/path/to/category-image.jpg"}
+              ]
+            }
+          }
         }
       ]
     },
