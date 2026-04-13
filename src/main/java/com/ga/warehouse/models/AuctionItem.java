@@ -1,6 +1,7 @@
 package com.ga.warehouse.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ga.warehouse.enums.WareHouseItemsCondition;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -49,6 +50,7 @@ public class AuctionItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"role", "passwordHistories", "bids", "userProfile"})
     private User createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY)

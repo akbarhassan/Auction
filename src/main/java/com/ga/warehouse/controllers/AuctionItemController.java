@@ -24,7 +24,7 @@ public class AuctionItemController {
     private final UserService userService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('auction-item:create')")
+    @PreAuthorize("hasAuthority('auctionitem:create')")
     public ResponseEntity<SuccessResponse> createAuctionItem(@RequestBody AuctionItem auctionItem, @AuthenticationPrincipal UserDetails userDetails) {
         Long creatorId = userService.findUserByEmailAddress(userDetails.getUsername()).getId();
 
@@ -33,28 +33,28 @@ public class AuctionItemController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('auction-item:read')")
+    @PreAuthorize("hasAuthority('auctionitem:read')")
     public ResponseEntity<SuccessResponse> getAllAuctionItems() {
         List<AuctionItem> items = auctionItemService.getAllAuctionItems();
         return ResponseBuilder.success(HttpStatus.OK, "All auction items retrieved", items);
     }
 
     @GetMapping("{id}")
-    @PreAuthorize("hasAuthority('auction-item:read')")
+    @PreAuthorize("hasAuthority('auctionitem:read')")
     public ResponseEntity<SuccessResponse> getAuctionItemById(@PathVariable Long id) {
         AuctionItem item = auctionItemService.getAuctionItemById(id);
         return ResponseBuilder.success(HttpStatus.OK, "Auction item retrieved successfully", item);
     }
 
     @PutMapping("{id}")
-    @PreAuthorize("hasAuthority('auction-item:update')")
+    @PreAuthorize("hasAuthority('auctionitem:update')")
     public ResponseEntity<SuccessResponse> updateAuctionItem(@PathVariable Long id, @RequestBody AuctionItem auctionItem) {
         AuctionItem updated = auctionItemService.updateAuctionItem(id, auctionItem);
         return ResponseBuilder.success(HttpStatus.OK, "Auction item updated successfully", updated);
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasAuthority('auction-item:delete')")
+    @PreAuthorize("hasAuthority('auctionitem:delete')")
     public ResponseEntity<SuccessResponse> deleteAuctionItem(@PathVariable Long id) {
         auctionItemService.deleteAuctionItem(id);
         return ResponseBuilder.success(HttpStatus.OK, "Auction item deleted successfully", null);
@@ -62,21 +62,21 @@ public class AuctionItemController {
 
     // === FILE UPLOADS ===
     @PostMapping("{id}/display-image")
-    @PreAuthorize("hasAuthority('auction-item:update')")
+    @PreAuthorize("hasAuthority('auctionitem:update')")
     public ResponseEntity<SuccessResponse> uploadDisplayImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         AuctionItem updated = auctionItemService.uploadDisplayImage(id, file);
         return ResponseBuilder.success(HttpStatus.OK, "Display image uploaded successfully", updated);
     }
 
     @PostMapping("{id}/gallery-images")
-    @PreAuthorize("hasAuthority('auction-item:update')")
+    @PreAuthorize("hasAuthority('auctionitem:update')")
     public ResponseEntity<SuccessResponse> uploadGalleryImages(@PathVariable Long id, @RequestParam("files") List<MultipartFile> files) {
         AuctionItem updated = auctionItemService.uploadGalleryImages(id, files);
         return ResponseBuilder.success(HttpStatus.OK, "Gallery images uploaded successfully", updated);
     }
 
     @DeleteMapping("{id}/gallery-images/{fileName}")
-    @PreAuthorize("hasAuthority('auction-item:update')")
+    @PreAuthorize("hasAuthority('auctionitem:update')")
     public ResponseEntity<SuccessResponse> removeGalleryImage(@PathVariable Long id, @PathVariable String fileName) {
         auctionItemService.removeGalleryImage(id, fileName);
         return ResponseBuilder.success(HttpStatus.OK, "Gallery image removed successfully", null);

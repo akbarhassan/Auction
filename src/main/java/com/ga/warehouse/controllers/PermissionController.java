@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/auth/permissions")
+@RequestMapping("/api/v1/permissions")
 public class PermissionController {
 
     private PermissionService permissionService;
