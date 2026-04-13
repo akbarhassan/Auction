@@ -39,6 +39,7 @@ public class EmailVerificationTokenService {
     @Transactional
     public EmailVerificationToken createToken(User user) {
         tokenRepository.deleteByUserId(user.getId());
+        tokenRepository.flush();
 
         String token = generateToken();
         LocalDateTime expiresAt = LocalDateTime.now().plusHours(tokenExpiryHours);

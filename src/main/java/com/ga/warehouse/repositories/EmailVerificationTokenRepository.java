@@ -3,6 +3,7 @@ package com.ga.warehouse.repositories;
 
 import com.ga.warehouse.models.EmailVerificationToken;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -22,6 +23,8 @@ public interface EmailVerificationTokenRepository extends JpaRepository<EmailVer
     @Query("SELECT t FROM EmailVerificationToken t WHERE t.token = :token AND t.expiresAt > :now AND t.used = false")
     Optional<EmailVerificationToken> findValidToken(@Param("token") String token, @Param("now") LocalDateTime now);
 
-    void deleteByUserId(Long userId);
+    @Modifying
+    @Query("DELETE FROM EmailVerificationToken t WHERE t.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 
 }

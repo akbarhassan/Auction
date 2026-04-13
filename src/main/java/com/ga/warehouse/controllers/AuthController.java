@@ -69,7 +69,8 @@ public class AuthController {
      * POST /api/v1/auth/resend-verification
      */
     @PostMapping("/resend-verification")
-    public ResponseEntity<SuccessResponse> resendVerification(@RequestParam String email) {
+    public ResponseEntity<SuccessResponse> resendVerification(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
         authService.resendVerificationEmail(email);
         return ResponseBuilder.success(
                 HttpStatus.OK,
