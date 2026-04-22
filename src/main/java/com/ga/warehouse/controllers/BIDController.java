@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Future;
 
 @Slf4j
 @RestController
@@ -27,7 +28,7 @@ public class BIDController {
     private final UserService userService;
 
     /**
-     * Place a bid on an auction
+     * Place a bid on an auction using thread pool for concurrent processing
      * POST /api/v1/auctions/{auctionId}/bids
      * Body: { "amount": 150.0 }
      */
@@ -36,17 +37,20 @@ public class BIDController {
     public ResponseEntity<SuccessResponse> placeBid(
             @PathVariable Long auctionId,
             @RequestBody Float bidAmount,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal UserDetails userDetails) throws Exception {
 
         // 1. Get authenticated user ID
         Long bidderId = userService.findUserByEmailAddress(userDetails.getUsername()).getId();
 
-        // 2. Place bid (service handles threading internally)
+        // 2. Submit bid to thread pool for concurrent processing
         log.info("📥 Bid request: auction={}, amount={}, user={}", auctionId, bidAmount, bidderId);
 
-        BID savedBid = bidService.processBid(auctionId, bidAmount, bidderId);
+        Future<BID> bidFuture = bidService.placeBidAsync(auctionId, bidAmount, bidderId);
 
-        log.info("📤 Bid response: id={}", savedBid.getId());
+        // 3. Wait for result from thread pool (demonstrates thread usage while maintaining response)
+        BID savedBid = bidFuture.get();
+
+        log.info("📤 Bid response: id={}, processed by thread pool", savedBid.getId());
 
         return ResponseBuilder.success(
                 HttpStatus.CREATED,
