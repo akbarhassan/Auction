@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,6 +43,8 @@ public class BIDService {
     @Qualifier("notificationExecutorService")
     private final ExecutorService notificationExecutorService;
 
+    private final TransactionTemplate transactionTemplate;
+
 
     /**
      * Place a bid using explicit Java threading
@@ -52,7 +55,9 @@ public class BIDService {
         return bidExecutorService.submit(() -> {
             try {
                 log.info("🧵 Bid processing started in thread: {}", Thread.currentThread().getName());
-                return processBid(auctionId, bidAmount, bidderId);
+                // Use TransactionTemplate for programmatic transaction in thread pool
+                // @Transactional doesn't work across threads, so we manage transaction manually
+                return transactionTemplate.execute(status -> processBidInternal(auctionId, bidAmount, bidderId));
             } catch (Exception e) {
                 log.error("❌ Bid processing failed in thread: {}", Thread.currentThread().getName(), e);
                 throw e; // Re-throw so Future captures the exception
@@ -140,14 +145,19 @@ public class BIDService {
 
 
     /**
-     *
-     * @param auctionId
-     * @param bidAmount
-     * @param bidderId
-     * @return
+     * Public wrapper for direct (non-async) bid processing
+     * Uses Spring's @Transactional proxy
      */
     @Transactional
     public BID processBid(Long auctionId, Float bidAmount, Long bidderId) {
+        return processBidInternal(auctionId, bidAmount, bidderId);
+    }
+
+    /**
+     * Internal bid processing logic - used by both sync and async paths
+     * Transaction is managed by caller (either @Transactional or TransactionTemplate)
+     */
+    private BID processBidInternal(Long auctionId, Float bidAmount, Long bidderId) {
         Auction auction = auctionRepository.findByIdWithLock(auctionId).orElseThrow(
                 () -> new ResourceNotFoundException("Auction not found with id: " + auctionId)
         );
@@ -160,7 +170,7 @@ public class BIDService {
                 .orElseThrow(() -> new ResourceNotFoundException("Bidder not found"));
         validateBidder(auction, bidder);
 
-        // 5. Get previous highest bidder (for notification)
+        // Get previous highest bidder (for notification)
         Optional<BID> previousHighestBid = bidRepository.findFirstByAuctionIdOrderByAmountDesc(auctionId);
         User previousBidder = previousHighestBid.map(BID::getBidder).orElse(null);
         Float previousBidAmount = previousHighestBid.map(BID::getAmount).orElse(null);
